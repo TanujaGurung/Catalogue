@@ -5,6 +5,7 @@ import axios from "axios";
 export default class HomePage extends React.Component {
   state = {
     value: "products",
+    search: "",
     data: [],
   };
   componentDidMount() {
@@ -19,6 +20,11 @@ export default class HomePage extends React.Component {
     e.preventDefault();
 
     this.setState({ value: e.target.value });
+  };
+  handleSearch = (e) => {
+    e.preventDefault();
+    this.setState({ search: e.target.value });
+    //alert("hi");
   };
   fetchApi = () => {
     if (this.state.value == "products") {
@@ -37,24 +43,45 @@ export default class HomePage extends React.Component {
   };
   render() {
     const { data } = this.state;
+    console.log(this.state.search);
 
     return (
       <React.Fragment>
         <Navbar
           value={this.state.value}
           handleChangeEvent={this.handleChangeEvent}
+          search={this.state.search}
+          handleSearch={this.handleSearch}
         />
         <div id="cards_landscape_wrap-2">
           <div class="container">
             <div class="row">
               {data.length ? (
-                data.map((products) => (
-                  <Card
-                    price={products.price}
-                    image={products.image}
-                    title={products.title}
-                  />
-                ))
+                data
+                  .filter((val) => {
+                    if (this.state.search == "") {
+                      return val;
+                    } else if (
+                      val.title
+                        .toLowerCase()
+                        .includes(this.state.search.toLowerCase()) ||
+                      val.description
+                        .toLowerCase()
+                        .includes(this.state.search.toLowerCase()) ||
+                      val.category
+                        .toLowerCase()
+                        .includes(this.state.search.toLowerCase())
+                    ) {
+                      return val;
+                    }
+                  })
+                  .map((products) => (
+                    <Card
+                      price={products.price}
+                      image={products.image}
+                      title={products.title}
+                    />
+                  ))
               ) : (
                 <div>Loading... </div>
               )}

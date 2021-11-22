@@ -43,6 +43,9 @@ const Navbar = (props) => {
                   type="search"
                   placeholder="Search Products"
                   aria-label="Search"
+                  name="search"
+                  value={props.search}
+                  onChange={(e) => props.handleSearch(e)}
                 ></input>
               </form>
             </li>
