@@ -2,6 +2,10 @@ import React from "react";
 
 const Card = (props) => {
   //alert(props.title);
+  var count = 0;
+  if (props.category == "men's clothing") {
+    count++;
+  }
   return (
     <React.Fragment>
       <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">

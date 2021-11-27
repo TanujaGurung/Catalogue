@@ -2,16 +2,25 @@ import React from "react";
 import Navbar from "./Navbar";
 import Card from "./Card";
 import axios from "axios";
+import Modal from "./Modal";
+import { ModalHeader, ModalBody, ModalFooter } from "./Modal";
+import PieDiagram from "./PieDiagram";
+
 export default class HomePage extends React.Component {
   state = {
     value: "products",
     search: "",
     data: [],
+    modal: false,
+    pieData: [],
   };
   componentDidMount() {
     this.fetchApi();
   }
   componentDidUpdate(prevProps, prevState) {
+    if (prevState.data !== this.state.data) {
+      this.setState({ pieData: this.state.data });
+    }
     if (prevState.value !== this.state.value) {
       this.fetchApi();
     }
@@ -26,31 +35,36 @@ export default class HomePage extends React.Component {
     this.setState({ search: e.target.value });
     //alert("hi");
   };
-  fetchApi = () => {
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  };
+  fetchApi = async () => {
     if (this.state.value == "products") {
-      axios.get("https://fakestoreapi.com/products").then((res) => {
+      await axios.get("https://fakestoreapi.com/products").then((res) => {
         this.setState({ data: res.data });
-        // console.log(this.state.data);
+        console.log(this.state.data);
       });
     } else {
       axios
         .get("https://fakestoreapi.com/products/category/" + this.state.value)
         .then((res) => {
           this.setState({ data: res.data });
-          console.log(this.state.data);
+          //console.log(this.state.data);
         });
     }
   };
+
   render() {
-    const { data } = this.state;
-    console.log(this.state.search);
+    const { data, value, search } = this.state;
+
+    //console.log(this.state.search);
 
     return (
       <React.Fragment>
         <Navbar
-          value={this.state.value}
+          value={value}
           handleChangeEvent={this.handleChangeEvent}
-          search={this.state.search}
+          search={search}
           handleSearch={this.handleSearch}
         />
         <div id="cards_landscape_wrap-2">
@@ -80,6 +94,7 @@ export default class HomePage extends React.Component {
                       price={products.price}
                       image={products.image}
                       title={products.title}
+                      category={products.category}
                     />
                   ))
               ) : (
@@ -87,6 +102,48 @@ export default class HomePage extends React.Component {
               )}
             </div>
           </div>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-secondary float"
+          onClick={this.toggle}
+        >
+          Analyse
+        </button>
+        <div
+          className="modal-dialog modal-lg"
+          style={{ height: "auto", width: "100%" }}
+        >
+          <Modal
+            class="modal fade"
+            id="t_and_c_m"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="myModalLabel"
+            aria-hidden="true"
+            isOpen={this.state.modal}
+          >
+            <div className="modal-content">
+              <ModalHeader className="modal-header">
+                <button
+                  type="button"
+                  className="close"
+                  aria-label="Close"
+                  onClick={this.toggle}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </ModalHeader>
+              <div
+                className="modal-body"
+                style={{ height: "auto", width: "100%" }}
+              >
+                <PieDiagram data={data} />
+              </div>
+              <ModalFooter></ModalFooter>
+            </div>
+          </Modal>
         </div>
       </React.Fragment>
     );
